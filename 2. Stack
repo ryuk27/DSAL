@@ -1,0 +1,133 @@
+#include <iostream>
+#include <stack>
+#include <string>
+#include <cmath>
+#include <cctype> // Include for 'isalpha' function
+#include <algorithm>
+
+using namespace std;
+
+int priority(char op) {
+    if (op == '(' || op == ')') return 0;
+    else if (op == '+' || op == '-') return 1;
+    else if (op == '*' || op == '/' || op == '%') return 2;
+    else if (op == '^') return 3;
+    else return 4;
+}
+
+string infixToPostfixOrPrefix(string expression, bool isPrefix) {
+    string result;
+    stack<char> S;
+
+    if (isPrefix)
+        reverse(expression.begin(), expression.end());
+
+    for (char token : expression) {
+        if (isalnum(token)) // check if token is an alphabet or number
+            result += token;
+        else if (token == '(')
+            S.push(token);
+        else if (token == ')') {
+            while (S.top() != '(') {
+                result += S.top();
+                S.pop();
+            }
+            S.pop();
+        } else {
+            while (!S.empty() && priority(S.top()) >= priority(token)) {
+                result += S.top();
+                S.pop();
+            }
+            S.push(token);
+        }
+    }
+
+    while (!S.empty()) {
+        result += S.top();
+        S.pop();
+    }
+
+    if (isPrefix) {
+        reverse(result.begin(), result.end());
+        return result;
+    }
+
+    return result;
+}
+
+float evaluate(string expression, bool isPrefix) {
+    stack<float> S;
+
+    for (char token : expression) {
+        if (isalpha(token)) { // check if token is an alphabet
+            float value;
+            cout << "Enter value for variable " << token << ": ";
+            cin >> value;
+            S.push(value);
+        } else if (isdigit(token)) {
+            S.push(token - '0');
+        } else {
+            float op2 = S.top();
+            S.pop();
+            float op1 = S.top();
+            S.pop();
+            float res = 0;
+            switch (token) {
+                case '+':
+                    res = op1 + op2;
+                    break;
+                case '-':
+                    res = op1 - op2;
+                    break;
+                case '*':
+                    res = op1 * op2;
+                    break;
+                case '/':
+                    res = op1 / op2;
+                    break;
+                case '%':
+                    res = (int) op1 % (int) op2;
+                    break;
+                case '^':
+                    res = pow(op1, op2);
+                    break;
+            }
+            S.push(res);
+        }
+    }
+
+    return S.top();
+}
+
+int main() {
+    int choice;
+    string expression;
+
+    do {
+        cout << "\nEnter Choice of Operation:\n 1. Infix to Postfix 2. Infix to Prefix 3. Postfix Evaluation 4. Prefix Evaluation 5. Exit\n";
+        cin >> choice;
+
+        switch (choice) {
+            case 1:
+            case 2:
+                cout << "Enter Expression\n";
+                cin >> expression;
+                cout << (choice == 1 ? "Postfix: " : "Prefix: ") << infixToPostfixOrPrefix(expression, choice == 2) << endl;
+                break;
+            case 3:
+            case 4:
+                cout << "Enter Expression\n";
+                cin >> expression;
+                cout << "Answer: " << evaluate(expression, choice == 4) << endl;
+                break;
+            case 5:
+                cout << "End of program\n";
+                break;
+            default:
+                cout << "Wrong Choice\n";
+                break;
+        }
+    } while (choice != 5);
+
+    return 0;
+}
