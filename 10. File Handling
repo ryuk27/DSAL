@@ -1,0 +1,143 @@
+#include<iostream>
+#include<fstream>
+#include<cstdio>  // Include cstdio for std::remove
+using namespace std;
+
+struct student {
+    int rn;
+    char div;
+    char name[20], adr[20];
+};
+
+class File {
+    char fname[20];
+
+public:
+    void create();
+    void display();
+    void add();
+    void remove(int rn);
+    void search(int rn);
+};
+
+int main() {
+    int choice, rn;
+    File obj;
+
+    do {
+        cout << "Select operation from: 1. Create records 2. Display records 3. Add records 4. Remove records 5. Search records 6. Exit\n";
+        cin >> choice;
+
+        switch (choice) {
+            case 1: obj.create(); break;
+            case 2: obj.display(); break;
+            case 3: obj.add(); break;
+            case 4:
+                cout << "Enter student Roll No whose record to be deleted\n";
+                cin >> rn;
+                obj.remove(rn);
+                break;
+            case 5:
+                cout << "Enter student Roll No whose record to be searched\n";
+                cin >> rn;
+                obj.search(rn);
+                break;
+            case 6:
+                cout << "Exit\n";
+                break;
+            default:
+                cout << "Wrong Choice\n";
+                break;
+        }
+    } while (choice != 6);
+
+    return 0;
+}
+
+void File::create() {
+    ofstream fp(fname);
+    student s;
+    char option;
+
+    cout << "Enter File name to be opened\n";
+    cin >> fname;
+
+    do {
+        cout << "Enter student Roll No, Div, Name, Address\n";
+        cin >> s.rn >> s.div >> s.name >> s.adr;
+        fp.write((char*)(&s), sizeof(s));
+        cout << "Do you want to add more records\n";
+        cin >> option;
+    } while (option == 'y');
+
+    fp.close();
+}
+
+void File::display() {
+    ifstream fp(fname);
+    student s;
+
+    cout << "Roll No\tDiv\tName\tAddress\n";
+
+    while (fp.read((char*)(&s), sizeof(s))) {
+        cout << s.rn << "\t" << s.div << "\t" << s.name << "\t" << s.adr << "\n";
+    }
+
+    fp.close();
+}
+
+void File::add() {
+    ofstream fp(fname, ios::app);
+    student s;
+
+    cout << "Enter records to be added\n Enter Roll No\tDiv\tName\tAddress\n";
+    cin >> s.rn >> s.div >> s.name >> s.adr;
+    fp.write((char*)(&s), sizeof(s));
+    fp.close();
+}
+
+void File::search(int rn) {
+    ifstream fp(fname);
+    student s;
+    int flag = 0;
+
+    while (fp.read((char*)(&s), sizeof(s))) {
+        if (rn == s.rn) {
+            flag = 1;
+            break;
+        }
+    }
+
+    if (flag == 1) {
+        cout << s.rn << "\t" << s.div << "\t" << s.name << "\t" << s.adr << "\n";
+    } else {
+        cout << "Record not found\n";
+    }
+
+    fp.close();
+}
+
+void File::remove(int rn) {
+    ifstream fp1(fname);
+    ofstream fp2("temp.txt");
+    student s;
+    int found = 0;
+
+    while (fp1.read((char*)(&s), sizeof(s))) {
+        if (rn == s.rn) {
+            found = 1;
+        } else {
+            fp2.write((char*)(&s), sizeof(s));
+        }
+    }
+
+    fp1.close();
+    fp2.close();
+
+    std::remove(fname);
+    rename("temp.txt", fname);
+
+    if (!found) {
+        cout << "Record not found\n";
+    }
+}
