@@ -1,0 +1,87 @@
+#include <iostream>
+#define max 5
+using namespace std;
+
+class Queue {
+    int a[max];
+    int front, rear;
+
+public:
+    Queue() : front(-1), rear(-1) {}
+
+    bool isFull() {
+        return (rear + 1) % max == front;
+    }
+
+    bool isEmpty() {
+        return (rear == -1 || front == -1);
+    }
+
+    void enqueue(int value) {
+        if (isFull()) {
+            cout << "Queue is full, cannot insert more elements.\n";
+        } else {
+            if (front == -1)
+                front = 0;
+            rear = (rear + 1) % max;
+            a[rear] = value;
+        }
+    }
+
+    void dequeue() {
+        if (isEmpty()) {
+            cout << "Queue is empty, cannot delete element.\n";
+        } else {
+            cout << "Deleted element is: " << a[front] << "\n";
+            if (front == rear)
+                front = rear = -1;
+            else
+                front = (front + 1) % max;
+        }
+    }
+
+    void display() {
+        if (isEmpty()) {
+            cout << "Queue is empty.\n";
+        } else {
+            int i = front;
+            while (i != rear) {
+                cout << a[i] << "\t";
+                i = (i + 1) % max;
+            }
+            cout << a[rear] << "\n";
+        }
+    }
+};
+
+int main() {
+    int value, choice;
+    Queue q;
+
+    do {
+        cout << "Select operation: 1. Enqueue 2. Dequeue 3. Display 4. Exit\n";
+        cin >> choice;
+
+        switch (choice) {
+            case 1:
+                cout << "Enter value to be inserted: ";
+                cin >> value;
+                q.enqueue(value);
+                break;
+            case 2:
+                q.dequeue();
+                break;
+            case 3:
+                q.display();
+                break;
+            case 4:
+                cout << "Exit\n";
+                break;
+            default:
+                cout << "Wrong choice\n";
+                break;
+        }
+    } while (choice != 4);
+
+    return 0;
+}
