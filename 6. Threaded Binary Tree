@@ -1,0 +1,153 @@
+#include <iostream>
+#include <cstdlib>
+using namespace std;
+
+struct Node {
+    int data;
+    Node *left, *right;
+    int lbit, rbit;
+};
+
+class ThreadedBST {
+public:
+    Node *root, *head;
+
+    ThreadedBST() {
+        head = new Node{999, nullptr, nullptr, 1, 0};
+        head->right = head;
+        root = nullptr;
+    }
+
+    void insert(Node *&root, Node *temp);
+    void create();
+    void inorder();
+    void preorder();
+};
+
+void ThreadedBST::insert(Node *&root, Node *temp) {
+    char op;
+    if (temp->data <= root->data) {
+        if (root->lbit == 0) {
+            temp->left = root->left;
+            temp->right = root;
+            root->left = temp;
+            root->lbit = 1;
+        } else {
+            insert(root->left, temp);
+        }
+    } else {
+        if (root->rbit == 0) {
+            temp->right = root->right;
+            temp->left = root;
+            root->right = temp;
+            root->rbit = 1;
+        } else {
+            insert(root->right, temp);
+        }
+    }
+}
+
+void ThreadedBST::create() {
+    Node *temp;
+    char ch;
+    do {
+        temp = new Node;
+        cout << "\nEnter the value of the node: ";
+        cin >> temp->data;
+        temp->left = temp->right = nullptr;
+        temp->lbit = temp->rbit = 0;
+        if (root == nullptr) {
+            root = temp;
+            head->left = root;
+            root->right = head;
+            root->left = head;
+            root->rbit = 0;
+            root->lbit = 0;
+        } else {
+            insert(root, temp);
+        }
+        cout << "Do you want to continue? (Press Y/N): ";
+        cin >> ch;
+    } while (ch == 'Y' || ch == 'y');
+}
+
+void ThreadedBST::inorder() {
+    if (root == nullptr) {
+        cout << "Tree is empty." << endl;
+        return;
+    }
+    Node *t = head->left;
+    while (t->lbit != 0) {
+        t = t->left;
+    }
+    do {
+        cout << t->data << " ";
+        while (t->rbit == 0) {
+            t = t->right;
+            if (t == head) {
+                return;
+            }
+            cout << t->data << " ";
+        }
+        t = t->right;
+    } while (t != head);
+}
+
+void ThreadedBST::preorder() {
+    if (root == nullptr) {
+        cout << "Tree is empty." << endl;
+        return;
+    }
+    Node *t = head->left;
+    do {
+        while (t->lbit != 0) {
+            cout << t->data << " ";
+            t = t->left;
+        }
+        cout << t->data << " ";
+        while (t->rbit == 0) {
+            t = t->right;
+            if (t == head) {
+                return;
+            }
+        }
+        t = t->right;
+    } while (t != head);
+}
+
+int main() {
+    int op;
+    ThreadedBST t;
+
+    cout << "---------- THREADED BINARY TREE OPERATIONS ----------" << endl;
+    cout << "\nCreation of Binary Tree\n";
+    t.create();
+
+    do {
+        cout << "\n1. Inorder Traversing\n2. Preorder Traversing\n3. Create Tree Again\n4. Exit\n";
+        cout << "Enter your choice: ";
+        cin >> op;
+
+        switch (op) {
+            case 1:
+                cout << "Inordered traversal: ";
+                t.inorder();
+                break;
+            case 2:
+                cout << "Preordered traversal: ";
+                t.preorder();
+                break;
+            case 3:
+                cout << "\nCreation of Binary Tree\n";
+                t.create();
+                break;
+            case 4:
+                cout << "Exit" << endl;
+                break;
+            default:
+                cout << "Wrong choice" << endl;
+        }
+    } while (op != 4);
+
+    return 0;
+}
