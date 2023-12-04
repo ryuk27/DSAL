@@ -1,0 +1,128 @@
+#include <iostream>
+using namespace std;
+
+struct Node {
+    int data;
+    Node* left, *right;
+};
+
+class BST {
+    Node* root;
+
+public:
+    BST() : root(nullptr) {}
+
+    Node* createBST(Node* root, int value);
+    void displayPreorder(Node* root);
+    bool search(Node* root, int key);
+    int depth(Node* root);
+    void findLeaf(Node* root);
+
+    void menu();
+};
+
+Node* BST::createBST(Node* root, int value) {
+    if (root == nullptr) {
+        root = new Node{value, nullptr, nullptr};
+    } else if (value < root->data) {
+        root->left = createBST(root->left, value);
+    } else if (value > root->data) {
+        root->right = createBST(root->right, value);
+    }
+    return root;
+}
+
+void BST::displayPreorder(Node* root) {
+    if (root != nullptr) {
+        cout << root->data << " ";
+        displayPreorder(root->left);
+        displayPreorder(root->right);
+    }
+}
+
+bool BST::search(Node* root, int key) {
+    if (root == nullptr) {
+        return false;
+    } else if (key == root->data) {
+        return true;
+    } else if (key < root->data) {
+        return search(root->left, key);
+    } else {
+        return search(root->right, key);
+    }
+}
+
+int BST::depth(Node* root) {
+    if (root == nullptr) {
+        return 0;
+    } else {
+        int leftDepth = depth(root->left);
+        int rightDepth = depth(root->right);
+        return max(leftDepth, rightDepth) + 1;
+    }
+}
+
+void BST::findLeaf(Node* root) {
+    if (root != nullptr) {
+        if (root->left == nullptr && root->right == nullptr) {
+            cout << "Leaf Node=" << root->data << "\n";
+        }
+        findLeaf(root->left);
+        findLeaf(root->right);
+    }
+}
+
+void BST::menu() {
+    int choice, value;
+
+    do {
+        cout << "\nSelect any one operation from:\n"
+             << " 1. CreateBST\n"
+             << " 2. DisplayPreorder\n"
+             << " 3. Search key\n"
+             << " 4. Find Depth\n"
+             << " 5. Find leaf nodes\n"
+             << " 6. Exit\n";
+        cin >> choice;
+
+        switch (choice) {
+            case 1:
+                cout << "Enter data for new node => ";
+                cin >> value;
+                root = createBST(root, value);
+                break;
+            case 2:
+                cout << "Display Preorder Output: ";
+                displayPreorder(root);
+                cout << endl;
+                break;
+            case 3:
+                cout << "Enter value to be searched in BST: ";
+                cin >> value;
+                if (search(root, value)) {
+                    cout << "Key value found in BST\n";
+                } else {
+                    cout << "Key value NOT FOUND in BST\n";
+                }
+                break;
+            case 4:
+                cout << "Depth of BST = " << depth(root) - 1 << endl;
+                break;
+            case 5:
+                findLeaf(root);
+                break;
+            case 6:
+                cout << "EXIT\n";
+                break;
+            default:
+                cout << "Wrong choice\n";
+        }
+    } while (choice != 6);
+}
+
+int main() {
+    BST b;
+    b.menu();
+
+    return 0;
+}
