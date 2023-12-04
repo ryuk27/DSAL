@@ -1,0 +1,163 @@
+#include <iostream>
+#include <cstring> // Use <cstring> instead of <string.h> for C++ standard
+using namespace std;
+
+struct student {
+    int rn;
+    char name[50];
+    float sgpa;
+};
+
+// Function declarations
+void displayInfo(const student s[], int n);
+void bubbleSort(student s[], int n);
+void insertionSort(student s[], int n);
+void quickSort(student s[], int first, int last);
+void displayInfoReverse(const student s[], int n);
+void linearSearch(const student s[], int n, float key);
+int binarySearch(const student s[], int low, int high, const char keyname[]);
+
+int main() {
+    const int maxSize = 50;
+    student s[maxSize];
+    int n, x;
+    float key;
+    char keyname[20];
+
+    cout << "How many students' data to be entered?\n";
+    cin >> n;
+
+    for (int i = 0; i < n; i++) {
+        cout << "Enter roll no\n";
+        cin >> s[i].rn;
+        cout << "Enter Name of student\n";
+        cin.ignore(); // Ignore the newline character left by previous cin
+        cin.getline(s[i].name, sizeof(s[i].name));
+        cout << "Enter sgpa\n";
+        cin >> s[i].sgpa;
+    }
+
+    displayInfo(s, n);
+    bubbleSort(s, n);
+    quickSort(s, 0, n - 1);
+    displayInfoReverse(s, n);
+    insertionSort(s, n);
+
+    cout << "Enter SGPA marks to be searched\n";
+    cin >> key;
+    linearSearch(s, n, key);
+
+    cout << "Enter name of the student to be searched\n";
+    cin.ignore(); // Ignore the newline character left by previous cin
+    cin.getline(keyname, sizeof(keyname));
+    x = binarySearch(s, 0, n - 1, keyname);
+
+    if (x != -1) {
+        cout << "Student name found at position: " << x << endl;
+        cout << "Roll No: " << s[x].rn << "\tName: " << s[x].name << "\tSGPA: " << s[x].sgpa << endl;
+    } else {
+        cout << "Student record not found";
+    }
+
+    return 0;
+}
+
+// Function definitions
+
+void displayInfo(const student s[], int n) {
+    cout << "Display student information\n";
+    for (int i = 0; i < n; i++) {
+        cout << s[i].rn << "\t" << s[i].name << "\t" << s[i].sgpa << "\n";
+    }
+}
+
+void displayInfoReverse(const student s[], int n) {
+    cout << "Display student information in reverse order\n";
+    for (int i = n - 1; i >= 0; i--) {
+        cout << s[i].rn << "\t" << s[i].name << "\t" << s[i].sgpa << "\n";
+    }
+}
+
+void bubbleSort(student s[], int n) {
+    cout << "Sort student data as per their roll no using Bubble Sort\n";
+    for (int pass = 1; pass <= n - 1; pass++) {
+        for (int i = 0; i < n - pass; i++) {
+            if (s[i].rn > s[i + 1].rn) {
+                // Swap elements if they are in the wrong order
+                swap(s[i], s[i + 1]);
+            }
+        }
+    }
+    displayInfo(s, n);
+}
+
+void insertionSort(student s[], int n) {
+    cout << "Sorting student information alphabetically using Insertion Sort\n";
+    for (int i = 1; i < n; i++) {
+        student key = s[i];
+        int j = i - 1;
+
+        // Move elements greater than key to one position ahead
+        while (j >= 0 && strcmp(key.name, s[j].name) < 0) {
+            s[j + 1] = s[j];
+            j--;
+        }
+
+        // Insert the key at its correct position
+        s[j + 1] = key;
+    }
+    displayInfo(s, n);
+}
+
+void quickSort(student s[], int first, int last) {
+    if (first < last) {
+        int pivot = first;
+        int i = first;
+        int j = last;
+
+        while (i < j) {
+            while (s[i].sgpa <= s[pivot].sgpa && i < last)
+                i++;
+
+            while (s[j].sgpa > s[pivot].sgpa)
+                j--;
+
+            if (i < j) {
+                swap(s[i], s[j]);
+            }
+        }
+
+        swap(s[pivot], s[j]);
+
+        // Recursive calls for left and right partitions
+        quickSort(s, first, j - 1);
+        quickSort(s, j + 1, last);
+    }
+}
+
+void linearSearch(const student s[], int n, float key) {
+    int flag = 0;
+    for (int i = 0; i < n; i++) {
+        if (key == s[i].sgpa) {
+            cout << "Student with SGPA " << key << " found: " << s[i].rn << "\t" << s[i].name << "\n";
+            flag = 1;
+        }
+    }
+    if (flag == 0)
+        cout << "Student record not found";
+}
+
+int binarySearch(const student s[], int low, int high, const char keyname[]) {
+    while (low <= high) {
+        int mid = (low + high) / 2;
+        int cmp = strcmp(keyname, s[mid].name);
+
+        if (cmp == 0)
+            return mid;
+        else if (cmp < 0)
+            high = mid - 1;
+        else
+            low = mid + 1;
+    }
+    return -1;
+}
